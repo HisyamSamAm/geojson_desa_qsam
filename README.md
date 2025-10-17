@@ -1,128 +1,85 @@
-# GeoJSON Desa Project
+# Penjelasan File geojson_desa.js
 
-This project contains GeoJSON data for village (desa) roads and a Node.js script to insert this data into MongoDB for geospatial analysis.
+## Deskripsi Umum
+File `geojson_desa.js` berisi data geografis dalam format GeoJSON yang mewakili jaringan jalan di sebuah desa (desa). Data ini diekspor dari OpenStreetMap (OSM) menggunakan alat overpass-turbo pada tanggal 17 Oktober 2025 pukul 02:21:47 UTC.
 
-## Files
+## Struktur Data
+File ini adalah objek GeoJSON dengan tipe `FeatureCollection`, yang terdiri dari:
+- **type**: "FeatureCollection" - Menunjukkan bahwa ini adalah kumpulan fitur geografis.
+- **generator**: "overpass-turbo" - Alat yang digunakan untuk mengekstrak data dari OSM.
+- **copyright**: Data berasal dari www.openstreetmap.org dan dilisensikan di bawah ODbL (Open Database License).
+- **timestamp**: Waktu ekspor data.
+- **features**: Array dari objek fitur, masing-masing mewakili sebuah jalan atau segmen jalan.
 
-### geojson_desa.js
-This file contains a GeoJSON FeatureCollection representing road and path data from a village area in Indonesia. The data was generated from OpenStreetMap using overpass-turbo.
+## Struktur Fitur
+Setiap fitur dalam array `features` memiliki struktur sebagai berikut:
 
-**Key Features:**
-- **Type:** FeatureCollection
-- **Features:** 200+ individual road/path features
-- **Geometry Type:** LineString (road segments)
-- **Properties Include:**
-  - `@id`: OpenStreetMap way ID
-  - `highway`: Road type (primary, secondary, residential, living_street, unclassified, service, path, track)
-  - `name`: Road name (in Indonesian)
-  - `lanes`: Number of lanes
-  - `width`: Road width in meters
-  - `surface`: Road surface type (asphalt, concrete, paving_stones, unpaved)
-  - `smoothness`: Road condition
-  - `motorcar`/`motorcycle`: Vehicle access restrictions
-  - `oneway`: Traffic direction
-  - `access`: Access permissions
+### Properties (Atribut)
+Setiap fitur memiliki objek `properties` yang berisi metadata tentang jalan tersebut:
+- **@id**: ID unik dari OSM (misalnya "way/28040802"), menunjukkan bahwa data berasal dari way (jalan) di OSM.
+- **name**: Nama jalan (misalnya "Jalan Daeng Muhammad Ardiwinata", "Jalan Ciwaruga", "Gang Madja").
+- **highway**: Jenis jalan, seperti:
+  - "tertiary": Jalan tersier (jalan utama di tingkat lokal).
+  - "secondary": Jalan sekunder (jalan penghubung penting).
+  - "primary": Jalan primer (jalan utama).
+  - "residential": Jalan perumahan.
+  - "unclassified": Jalan tanpa klasifikasi spesifik.
+  - "living_street": Jalan pejalan kaki dengan prioritas.
+  - "service": Jalan layanan (akses ke properti).
+  - "path": Jalur pejalan kaki atau sepeda.
+  - "track": Jalur tanah.
+- **lanes**: Jumlah lajur (misalnya 1, 2).
+- **smoothness**: Kondisi permukaan jalan (misalnya "good", "intermediate", "bad").
+- **surface**: Jenis permukaan (misalnya "concrete", "asphalt", "paving_stones", "unpaved").
+- **width**: Lebar jalan dalam meter (misalnya "3.5", "2").
+- **motorcar**: Akses kendaraan bermotor ("yes", "no", "destination").
+- **motorcycle**: Akses sepeda motor ("yes").
+- **oneway**: Apakah jalan satu arah ("yes", "no").
+- **ref**: Referensi jalan (misalnya "247" untuk Jalan Kolonel Masturi).
+- **source**: Sumber data (misalnya "GPS").
+- **access**: Tingkat akses ("private").
+- **foot**: Akses pejalan kaki ("designated").
+- **incline**: Kemiringan ("down").
+- **service**: Jenis layanan (misalnya "driveway").
 
-**Data Source:**
-- Generated from OpenStreetMap data
-- Timestamp: 2025-10-17T02:21:47Z
-- Copyright: The data is made available under ODbL (Open Database License)
+### Geometry
+Setiap fitur memiliki objek `geometry` dengan:
+- **type**: "LineString" - Semua fitur adalah garis (jalan sebagai garis).
+- **coordinates**: Array dari pasangan koordinat [longitude, latitude] yang membentuk jalur jalan. Koordinat ini tidak dianalisis secara detail sesuai permintaan.
 
-### insert_geojson.js
-A Node.js script that reads the GeoJSON data and inserts it into MongoDB for storage and geospatial querying.
+## Contoh Fitur
+Berikut adalah contoh salah satu fitur dalam file:
 
-**Features:**
-- Connects to MongoDB using connection string from environment variables
-- Parses the GeoJSON file
-- Inserts individual features into a MongoDB collection
-- Creates a 2dsphere geospatial index for spatial queries
-- Error handling and connection management
-
-## Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (local installation or cloud service like MongoDB Atlas)
-- npm or yarn package manager
-
-## Installation
-
-1. Clone or download this project
-2. Install dependencies:
-   ```bash
-   npm install mongodb dotenv
-   ```
-
-3. Set up environment variables:
-   Create a `.env` file in the project root with:
-   ```
-   MONGODB_URI=mongodb://localhost:27017/your_database
-   # or for MongoDB Atlas:
-   # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/your_database
-   ```
-
-## Usage
-
-### Running the Insertion Script
-
-1. Ensure MongoDB is running (if using local installation)
-2. Run the script:
-   ```bash
-   node insert_geojson.js
-   ```
-
-The script will:
-- Connect to your MongoDB database
-- Read and parse the `geojson_desa.js` file
-- Insert all features into the `features` collection in `geojson_desa_db` database
-- Create a geospatial index on the `geometry` field
-- Display success messages and close the connection
-
-### Expected Output
-```
-Connected to MongoDB
-200 features inserted successfully
-Geospatial index created on geometry field
-Connection closed
+```json
+{
+  "type": "Feature",
+  "properties": {
+    "@id": "way/28040802",
+    "alt_name": "Jalan Cihanjuang",
+    "avgspeed": "25",
+    "highway": "tertiary",
+    "lanes": "2",
+    "name": "Jalan Daeng Muhammad Ardiwinata",
+    "smoothness": "good",
+    "surface": "concrete",
+    "width": "3.5"
+  },
+  "geometry": {
+    "type": "LineString",
+    "coordinates": [
+      [107.5764057, -6.8135224],
+      [107.5763704, -6.8137883],
+      // ... lebih banyak koordinat
+    ]
+  },
+  "id": "way/28040802"
+}
 ```
 
-## Database Structure
+## Penggunaan Data
+Data ini dapat digunakan untuk:
+- Visualisasi peta jalan di desa.
+- Analisis jaringan jalan (misalnya klasifikasi jalan, kondisi permukaan).
+- Pengembangan aplikasi GIS atau pemetaan.
+- Penelitian geografis tentang infrastruktur jalan.
 
-After insertion, your MongoDB will contain:
-
-- **Database:** `geojson_desa_db`
-- **Collection:** `features`
-- **Documents:** Individual GeoJSON features with properties and geometry
-- **Index:** 2dsphere index on `geometry` field for spatial queries
-
-## Example Queries
-
-Once data is inserted, you can perform geospatial queries:
-
-```javascript
-// Find all primary highways
-db.features.find({ "properties.highway": "primary" })
-
-// Find features within a specific area (requires geospatial index)
-db.features.find({
-  geometry: {
-    $geoIntersects: {
-      $geometry: {
-        type: "Polygon",
-        coordinates: [[[longitude1, latitude1], [longitude2, latitude2], ...]]
-      }
-    }
-  }
-})
-```
-
-## Notes
-
-- The GeoJSON data contains Indonesian road names and follows OpenStreetMap tagging conventions
-- All coordinates are in WGS84 (EPSG:4326) format
-- The script assumes the GeoJSON file is in the same directory
-- Make sure your MongoDB user has write permissions to the target database
-- The geospatial index enables efficient spatial queries for location-based analysis
-
-## License
-
-The GeoJSON data is provided under the Open Database License (ODbL) as per OpenStreetMap licensing terms.
